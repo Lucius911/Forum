@@ -33,7 +33,7 @@ namespace Forum.Controllers
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreatePost([FromBody]CreateForumPostDto createForumPost)
+    public async Task<IActionResult> CreatePost([FromBody] CreateForumPostDto createForumPost)
     {
       try
       {
@@ -42,13 +42,38 @@ namespace Forum.Controllers
         {
           return Unauthorized("You have to be logged in to create a blog post.");
         }
-        
+
         createForumPost.UserId = userId;
         var post = createForumPost.Map();
 
         await _forumService.CreatePostAsync(post);
 
         return this.Ok();
+      }
+      catch (Exception e)
+      {
+        return this.BadRequest(e.Message);
+      }
+    }
+
+    [Authorize]
+    [HttpPost("/ToggleLike")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ToggleLike([FromBody] int postId)
+    {
+      try
+      {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+          return Unauthorized("You have to be logged in to like a post.");
+        }
+
+        var result = await _forumService.ToggleLikeAsync(postId, userId);
+
+        return this.Ok(result ? "Post liked" : "Post unliked");
       }
       catch (Exception e)
       {

@@ -6,5 +6,6 @@ namespace Forum.Data.Services.ForumService
   {
     Task<List<ForumPost>> GetAllPostsAsync();
     Task<ForumPost> CreatePostAsync(ForumPost post);
+    Task<bool> ToggleLikeAsync(int postId, string userId);
   }
 }

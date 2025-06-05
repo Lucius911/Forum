@@ -39,5 +39,41 @@ namespace Forum.Data.Services.ForumService
         throw new Exception($"Error while attempting CreatePostAsync: {ex.Message}");
       }
     }
+
+    public async Task<bool> ToggleLikeAsync(int postId, string userId)
+    {
+      try
+      {
+        var likeExists = await _context.ForumLikes.FirstOrDefaultAsync(x => x.ForumPost.Id == postId &&
+                                                                      x.UserId == userId);
+
+        //Implement facebook logic If user has already liked the post, remove the like else save the like
+
+        if (likeExists != null)
+        {
+          _logger.LogInformation($"User {userId} removed like from post {postId}.");
+          _context.ForumLikes.Remove(likeExists);
+          await _context.SaveChangesAsync().ConfigureAwait(false);
+          return false; // unliked
+        }
+
+        var like = new ForumLike
+        {
+          ForumPostId = postId,
+          UserId = userId,
+          LikedAt = DateTime.UtcNow
+        };
+
+        _context.ForumLikes.Add(like);
+        await _context.SaveChangesAsync().ConfigureAwait(false);
+
+        return true; // liked
+      }
+      catch (Exception e)
+      {
+        _logger.LogError(e, "An error occurred while liking a forum post.");
+        throw new Exception($"Error while attempting ToggleLikeAsync: {e.Message}");
+      }
+    }
   }
 }
