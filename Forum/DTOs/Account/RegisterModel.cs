@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Forum.DTOs
+namespace Forum.DTOs.Account
 {
   public class RegisterModel
   {

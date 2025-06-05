@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Forum;
 
@@ -20,7 +21,31 @@ public class Program
     builder.Services.AddControllers();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddSwaggerGen(c =>
+    {
+      c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+      {
+        Description = "JWT Auth",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Scheme = "Bearer",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+      });
+
+      c.AddSecurityRequirement(new OpenApiSecurityRequirement
+      {
+        {
+          new OpenApiSecurityScheme {
+            Reference = new OpenApiReference {
+              Type = ReferenceType.SecurityScheme,
+              Id = "Bearer"
+            }
+          },
+          Array.Empty<string>()
+        }
+      });
+    });
 
     //Add Entity Framework Core and SQL Server support
     builder.Services.AddDbContext<ForumContext>(options => 

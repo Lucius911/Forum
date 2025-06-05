@@ -17,6 +17,25 @@ namespace Forum.Data
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      base.OnModelCreating(modelBuilder);
+      // Additional model configurations can be added here
+
+      //Not needed but good to specify relationships explicitly
+
+      #region relationships
+
+      modelBuilder.Entity<ForumPost>()
+        .HasOne(x => x.User)
+        .WithMany()
+        .HasForeignKey(x => x.UserId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      #endregion
+
+    }
+
     public DbSet<ForumPost> ForumPosts { get; set; }
   }
 }

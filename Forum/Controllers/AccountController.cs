@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Forum.DTOs;
+using Forum.DTOs.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -57,11 +58,15 @@ namespace Forum.Controllers
 
       var user = await userManager.FindByEmailAsync(model.Email);
       var token = GenerateJwtToken(user);
-      return Ok(new
-      {
-        Token = token, 
-        Expiration = token.ValidTo
-      });
+      var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+      // return for ease of use
+      return this.Ok(tokenString);
+      //return Ok(new
+      //{
+      //  Token = token, 
+      //  Expiration = token.ValidTo
+      //});
 
     }
 

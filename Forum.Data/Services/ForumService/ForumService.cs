@@ -22,5 +22,22 @@ namespace Forum.Data.Services.ForumService
         throw new Exception($"Error while attempting GetAllPostsAsync: {ex.Message}");
       }
     }
+
+    public async Task<ForumPost> CreatePostAsync(ForumPost post)
+    {
+      try
+      {
+        _logger.LogInformation("Creating blog post");
+        _context.ForumPosts.Add(post);
+        var result = await context.SaveChangesAsync().ConfigureAwait(false);
+
+        return post;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "An error occurred while creating a forum post.");
+        throw new Exception($"Error while attempting CreatePostAsync: {ex.Message}");
+      }
+    }
   }
 }
