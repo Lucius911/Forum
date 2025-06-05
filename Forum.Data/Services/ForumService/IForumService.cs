@@ -1,6 +1,10 @@
-﻿namespace Forum.Data.Services.ForumService
+﻿using Forum.Data.Models;
+
+namespace Forum.Data.Services.ForumService
 {
-    public interface IForumService
-    {
-    }
+  public interface IForumService
+  {
+    Task<List<ForumPost>> GetAllPostsAsync();
+
+  }
 }
