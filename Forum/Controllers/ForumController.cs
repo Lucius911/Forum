@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Forum.Data.Models;
+using Forum.Data.Models.Forum;
 using Forum.Data.Services.ForumService;
 using Forum.DTOs.ForumPost;
 using Microsoft.AspNetCore.Authorization;

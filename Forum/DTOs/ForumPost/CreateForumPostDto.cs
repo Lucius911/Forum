@@ -2,7 +2,7 @@
 
 namespace Forum.DTOs.ForumPost
 {
-  public class CreateForumPostDto : Mapping.IMapTo<Data.Models.ForumPost>
+  public class CreateForumPostDto : Mapping.IMapTo<Data.Models.Forum.ForumPost>
   {
     [Required]
     public string Title { get; set; }
@@ -14,9 +14,9 @@ namespace Forum.DTOs.ForumPost
     //will do if time for FE.
     //public byte[]? Image { get; set; }
 
-    public Data.Models.ForumPost Map()
+    public Data.Models.Forum.ForumPost Map()
     {
-      return new Data.Models.ForumPost
+      return new Data.Models.Forum.ForumPost
       {
         Title = this.Title,
         Content = this.Content,

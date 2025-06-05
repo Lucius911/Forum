@@ -58,10 +58,9 @@ namespace Forum.Controllers
 
       var user = await userManager.FindByEmailAsync(model.Email);
       var token = GenerateJwtToken(user);
-      var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-      // return for ease of use
-      return this.Ok(tokenString);
+      // return for ease of use 
+      return this.Ok(new JwtSecurityTokenHandler().WriteToken(token));
       //return Ok(new
       //{
       //  Token = token, 

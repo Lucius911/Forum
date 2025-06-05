@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Forum.Data.Models;
+using Forum.Data.Models.Forum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -37,5 +37,7 @@ namespace Forum.Data
     }
 
     public DbSet<ForumPost> ForumPosts { get; set; }
+    public DbSet<ForumComment> ForumComments { get; set; }
+    public DbSet<ForumLike> ForumLikes { get; set; }
   }
 }

@@ -1,4 +1,4 @@
-﻿using Forum.Data.Models;
+﻿using Forum.Data.Models.Forum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

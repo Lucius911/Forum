@@ -1,4 +1,4 @@
-﻿using Forum.Data.Models;
+﻿using Forum.Data.Models.Forum;
 
 namespace Forum.Data.Services.ForumService
 {
