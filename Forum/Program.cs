@@ -1,5 +1,6 @@
 using Forum.Data;
 using Forum.Data.Extensions;
+using Forum.DTOs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ public class Program
 
     //Inject Services
     builder.Services.AddForumDataServices();
+    builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
     builder.Services.AddIdentity<IdentityUser, IdentityRole>()
       .AddEntityFrameworkStores<ForumContext>()
       .AddDefaultTokenProviders();

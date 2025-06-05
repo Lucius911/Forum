@@ -15,14 +15,10 @@ namespace Forum.Controllers
   public class AccountController(
     UserManager<IdentityUser> userManager,
     SignInManager<IdentityUser> signInManager,
-    IConfiguration configuration,
     IOptions<JwtSettings> jwtSettings)
     : ControllerBase
   {
-    private readonly UserManager<IdentityUser> _userManager = userManager;
-    private readonly SignInManager<IdentityUser> _signInManager = signInManager;
-    private readonly IConfiguration _configuration = configuration;
-    private readonly IOptions<JwtSettings> _jwtSettings = jwtSettings;
+    private readonly JwtSettings _jwtSettings = jwtSettings.Value;
 
     [HttpPost("register")]
     [AllowAnonymous]
@@ -37,7 +33,7 @@ namespace Forum.Controllers
         UserName = model.DisplayName,
         Email = model.Email,
       };
-      var result = await _userManager.CreateAsync(user, model.Password);
+      var result = await userManager.CreateAsync(user, model.Password);
       if (result.Succeeded)
       {
         return Ok(new { Message = "User registered successfully." });
@@ -54,12 +50,12 @@ namespace Forum.Controllers
         return BadRequest(ModelState);
       }
 
-      var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+      var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
       if (!result.Succeeded)
         return Unauthorized();
 
 
-      var user = await _userManager.FindByEmailAsync(model.Email);
+      var user = await userManager.FindByEmailAsync(model.Email);
       var token = GenerateJwtToken(user);
       return Ok(new
       {
@@ -79,11 +75,11 @@ namespace Forum.Controllers
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
       };
 
-      var authSignKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_jwtSettings.Value.Key));
+      var authSignKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
       return new JwtSecurityToken(
-        issuer: _jwtSettings.Value.Issuer,
-        audience: _jwtSettings.Value.Audience,
+        issuer: jwtSettings.Value.Issuer,
+        audience: jwtSettings.Value.Audience,
         expires: DateTime.Now.AddMinutes(60),
         claims: authClaims,
         signingCredentials: new SigningCredentials(authSignKey, SecurityAlgorithms.HmacSha256)
