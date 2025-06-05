@@ -1,0 +1,7 @@
+﻿1) Please update connectionstring in appsettings.json to point to your database.
+
+2) Run the following commands in the Package Manager Console to create the database and apply migrations:
+	 Update-Database
+
+3) Should you want to add any migrations, use the following command:
+	 Add-Migration <MigrationName>
