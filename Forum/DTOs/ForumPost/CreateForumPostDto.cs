@@ -9,7 +9,7 @@ namespace Forum.DTOs.ForumPost
     [Required]
     public string Content { get; set; }
 
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
 
     //will do if time for FE.
     //public byte[]? Image { get; set; }
