@@ -48,7 +48,7 @@ public class Program
     });
 
     //Add Entity Framework Core and SQL Server support
-    builder.Services.AddDbContext<ForumContext>(options => 
+    builder.Services.AddDbContext<ForumContext>(options =>
       options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
     //Inject Services
@@ -77,11 +77,23 @@ public class Program
         ClockSkew = TimeSpan.Zero
       };
     });
-    
+
     // Add authorization
     builder.Services.AddAuthorization();
 
+    //ah classic cors add this so my FE works
+    builder.Services.AddCors(options =>
+    {
+      options.AddPolicy(name: "AllowMyFE", policy =>
+      {
+        policy.WithOrigins("http://localhost:8080")
+          .AllowAnyHeader()
+          .AllowAnyMethod();
+      });
+    });
+
     var app = builder.Build();
+    app.UseCors("AllowMyFE");
     app.UseAuthentication();
     app.UseAuthorization();
 

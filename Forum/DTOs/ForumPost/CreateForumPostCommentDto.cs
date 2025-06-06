@@ -3,7 +3,7 @@ using Forum.Data.Models.Forum;
 
 namespace Forum.DTOs.ForumPost
 {
-  public class CreateForumPostComment : Mapping.IMapTo<ForumComment>
+  public class CreateForumPostCommentDto : Mapping.IMapTo<ForumComment>
   {
     [Required]
     public string Comment { get; set; }

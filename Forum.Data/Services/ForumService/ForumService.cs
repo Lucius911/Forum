@@ -14,7 +14,7 @@ namespace Forum.Data.Services.ForumService
       try
       {
         _logger.LogInformation("Fetching all forum posts from the database.");
-        return await _context.ForumPosts.Include(x => x.Comments).ToListAsync().ConfigureAwait(false);
+        return await _context.ForumPosts.Include(x => x.Comments).Include(x => x.User).ToListAsync().ConfigureAwait(false);
       }
       catch (Exception ex)
       {

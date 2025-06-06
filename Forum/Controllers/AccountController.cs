@@ -66,7 +66,6 @@ namespace Forum.Controllers
       //  Token = token, 
       //  Expiration = token.ValidTo
       //});
-
     }
 
     private JwtSecurityToken GenerateJwtToken(IdentityUser user)
