@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace Forum.Data.Models.Forum
@@ -15,7 +16,14 @@ namespace Forum.Data.Models.Forum
     public DateTime UpdatedAt { get; set; }
     public IdentityUser User { get; set; } //Navigation prop
 
+    //Collections
     public ICollection<ForumComment> Comments { get; set; }
     public ICollection<ForumLike> Likes { get; set; }
+
+    //props not mapped
+    [NotMapped]
+    public int LikesCount { get; set; }
+    [NotMapped]
+    public string UserName { get; set; }
   }
 }

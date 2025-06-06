@@ -19,10 +19,11 @@
                 <v-progress-circular indeterminate color="primary" />
             </div>
 
-            <v-btn color="primary" @click="$router.push('/create-post')" class="mt-2">Create Post</v-btn>
+            <v-btn color="primary" @click="$router.push('/create-post')" class="mt-2" v-if="isAuthenticated">
+                Create Post
+            </v-btn>
 
-
-            <v-alert v-if="!loading && !posts.length && !this.isAuthenticated" type="info" variant="outlined">
+            <v-alert v-if="!loading && !posts.length && !isAuthenticated" type="info" variant="outlined">
                 No posts available. To create a post, please register or sign in.
             </v-alert>
 
@@ -35,12 +36,25 @@
                     <v-card>
                         <v-card-title>{{ post.title }}</v-card-title>
                         <v-card-text>{{ post.content }}</v-card-text>
+
+                        <v-card-actions>
+                            <v-btn icon>
+                                <v-icon @click="toggleLike(post.id)" color="blue">mdi-thumb-up-outline</v-icon>
+                                <span class="ml-1">{{ post.likesCount || 0 }}</span>
+                            </v-btn>
+
+                            <v-btn icon>
+                                <v-icon color="grey darken-1">mdi-comment-outline</v-icon>
+                                <span class="ml-1">{{ post.commentsCount || 0 }}</span>
+                            </v-btn>
+                        </v-card-actions>
                     </v-card>
                 </v-col>
             </v-row>
         </section>
     </v-container>
 </template>
+
 <script>
 export default {
     name: "LandingPage",
@@ -49,7 +63,7 @@ export default {
             posts: [],
             loading: true,
             error: null,
-            isAuthenticated: false
+            isAuthenticated: false,
         };
     },
     methods: {
@@ -70,19 +84,33 @@ export default {
         goToRegister() {
             this.$router.push("/register");
         },
+        async toggleLike(postId) {
+            console.log(this.isAuthenticated);
+            if (!this.isAuthenticated) {
+               this.$router.push("/login");
+            }
+
+            const result = await fetch(`https://localhost:7189/api/forum/ToggleLike/${postId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                },
+            });
+
+            if (!result.ok) {
+                return;
+            }
+        },
         isUserAuthenticated() {
             var tokenExists = localStorage.getItem("jwtToken");
-            if (tokenExists) {
-                this.isAuthenticated = true;
-            } else {
-                this.isAuthenticated = false;
-            }
-        }
+            this.isAuthenticated = !!tokenExists;
+        },
     },
     mounted() {
         this.fetchPosts();
         this.isUserAuthenticated();
-    }
+    },
 };
 </script>
 
@@ -101,5 +129,15 @@ button {
 
 .posts {
     margin-top: 30px;
+}
+
+.v-card-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.ml-1 {
+    margin-left: 4px;
 }
 </style>

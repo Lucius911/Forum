@@ -14,7 +14,24 @@ namespace Forum.Data.Services.ForumService
       try
       {
         _logger.LogInformation("Fetching all forum posts from the database.");
-        return await _context.ForumPosts.Include(x => x.Comments).Include(x => x.User).ToListAsync().ConfigureAwait(false);
+
+        return await _context.ForumPosts
+          .Include(x => x.User)
+          .Include(x => x.Comments)
+          .Select(x => new ForumPost
+          {
+            User = x.User,
+            Title = x.Title,
+            Content = x.Content,
+            Comments = x.Comments,
+            CreatedAt = x.CreatedAt,
+            UpdatedAt = x.UpdatedAt,
+            Id = x.Id,
+            UserId = x.User.Id,
+            LikesCount = x.Likes.Count, 
+            UserName = x.User.UserName,
+            Likes = null // we don't need to load this, we just need the count
+          }).ToListAsync();
       }
       catch (Exception ex)
       {

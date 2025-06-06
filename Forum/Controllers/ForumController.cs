@@ -27,15 +27,14 @@ namespace Forum.Controllers
 
         if (forumPostResult.Any())
         {
-          result = forumPostResult.Select(post => MapFromHelper.MapEntityToDto<ForumPost, FetchForumPostDto>(post))
-            .ToList();
+           result = MapFromHelper.MapEntitiesToDtos<ForumPost, FetchForumPostDto>(forumPostResult);
         }
 
         return this.Ok(result);
       }
       catch (Exception ex)
       {
-        return this.BadRequest(ex.Message);
+        return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
       }
     }
 
@@ -61,18 +60,18 @@ namespace Forum.Controllers
 
         return this.Ok();
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        return this.BadRequest(e.Message);
+        return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
       }
     }
 
     [Authorize]
-    [HttpPost("ToggleLike")]
+    [HttpPost("ToggleLike/{postId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ToggleLike([FromBody] int postId)
+    public async Task<IActionResult> ToggleLike(int postId)
     {
       try
       {

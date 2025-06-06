@@ -9,5 +9,11 @@
       dto.MapFrom(entity);
       return dto;
     }
+
+    public static List<TDto> MapEntitiesToDtos<TEntity, TDto>(IEnumerable<TEntity> entities)
+      where TDto : IMapFrom<TEntity>, new()
+    {
+      return entities.Select(entity => MapEntityToDto<TEntity, TDto>(entity)).ToList();
+    }
   }
 }
