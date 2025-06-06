@@ -50,13 +50,18 @@ namespace Forum.Controllers
       {
         return BadRequest(ModelState);
       }
+      var user = await userManager.FindByEmailAsync(model.Email);
 
-      var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+      if (user == null)
+      {
+        return this.Unauthorized("User does not exist, Please register");
+      }
+
+      var result = await signInManager.PasswordSignInAsync(user.UserName!, model.Password, false, false);
       if (!result.Succeeded)
         return Unauthorized();
 
 
-      var user = await userManager.FindByEmailAsync(model.Email);
       var token = GenerateJwtToken(user);
 
       // return for ease of use 
