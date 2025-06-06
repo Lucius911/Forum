@@ -18,6 +18,7 @@ namespace Forum.Data.Services.ForumService
         return await _context.ForumPosts
           .Include(x => x.User)
           .Include(x => x.Comments)
+          .ThenInclude(x => x.User)
           .Select(x => new ForumPost
           {
             User = x.User,

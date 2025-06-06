@@ -11,7 +11,7 @@ namespace Forum.DTOs.ForumPost
     [Required]
     public int ForumPostId { get; set; }
 
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
 
     public ForumComment Map()
     {

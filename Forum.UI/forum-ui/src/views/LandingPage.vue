@@ -36,6 +36,7 @@
                     <v-card>
                         <v-card-title>{{ post.title }}</v-card-title>
                         <v-card-text>{{ post.content }}</v-card-text>
+                        <v-divider class="my-2"></v-divider>
 
                         <v-card-actions>
                             <v-btn icon>
@@ -44,15 +45,43 @@
                             </v-btn>
 
                             <v-btn icon>
-                                <v-icon color="grey darken-1">mdi-comment-outline</v-icon>
+                                <v-icon @click="openCommentDialog(post.id)"
+                                    color="grey darken-1">mdi-comment-outline</v-icon>
                                 <span class="ml-1">{{ post.commentsCount || 0 }}</span>
                             </v-btn>
+                        </v-card-actions>
+                        <v-card-actions>
+                            <div v-if="post.comments && post.comments.length">
+                                <div v-for="comment in post.comments" :key="comment.id" class="pl-4 pb-2">
+                                    Comment by: <strong>{{ comment.username || 'Anonymous' }}:</strong> <br />
+                                    Message: {{ comment.content }}
+                                </div>
+                            </div>
+                            <v-alert v-else type="info" dense text>
+                                No comments yet. Be the first to comment!
+                            </v-alert>
                         </v-card-actions>
                     </v-card>
                 </v-col>
             </v-row>
         </section>
     </v-container>
+
+    <!-- MODAL FOR COMMENT  -->
+    <v-dialog v-model="commentDialog" max-width="500px">
+        <v-card>
+            <v-card-title class="headline">Add Comment</v-card-title>
+            <v-card-text>
+                <v-textarea v-model="newComment" label="Your Comment" rows="4" auto-grow outlined />
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text @click="commentDialog = false">Cancel</v-btn>
+                <v-btn color="primary" @click="submitComment">Submit</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
 </template>
 
 <script>
@@ -64,6 +93,9 @@ export default {
             loading: true,
             error: null,
             isAuthenticated: false,
+            commentDialog: false,
+            newComment: "",
+            activePostId: null,
         };
     },
     methods: {
@@ -72,6 +104,7 @@ export default {
                 const res = await fetch("https://localhost:7189/api/forum/fetchall");
                 if (!res.ok) throw new Error("Failed to fetch posts");
                 this.posts = await res.json();
+                console.log(this.posts);
             } catch (err) {
                 this.error = err.message;
             } finally {
@@ -87,7 +120,7 @@ export default {
         async toggleLike(postId) {
             console.log(this.isAuthenticated);
             if (!this.isAuthenticated) {
-               this.$router.push("/login");
+                this.$router.push("/login");
             }
 
             const result = await fetch(`https://localhost:7189/api/forum/ToggleLike/${postId}`, {
@@ -98,9 +131,46 @@ export default {
                 },
             });
 
+            await this.fetchPosts();
+
             if (!result.ok) {
                 return;
             }
+        },
+        openCommentDialog(postId) {
+            this.activePostId = postId;
+            this.commentDialog = true;
+        },
+        async submitComment() {
+            //replace with toast notification when you have time
+            if (!this.newComment.trim()) {
+                alert("I don't think you want to submit an empty comment.");
+                return;
+            }
+
+            console.log(this.newComment);
+            console.log(this.activePostId);
+
+            const result = await fetch("https://localhost:7189/api/forum/CreateComment", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                },
+                body: JSON.stringify({
+                    forumPostId: this.activePostId,
+                    comment: this.newComment
+                }),
+            });
+
+            if (!result.ok) {
+                alert("Failed to submit comment.");
+                return;
+            }
+
+            this.commentDialog = false;
+            await this.fetchPosts();
+
         },
         isUserAuthenticated() {
             var tokenExists = localStorage.getItem("jwtToken");

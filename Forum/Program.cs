@@ -104,6 +104,13 @@ public class Program
       app.UseSwaggerUI();
     }
 
+    //TODO: Remove this if you figure out wtf
+    app.Use(async (context, next) =>
+    {
+      Console.WriteLine($"Incoming: {context.Request.Method} {context.Request.Path}");
+      await next();
+    });
+
     app.UseHttpsRedirection();
     app.UseAuthorization();
     app.MapControllers();

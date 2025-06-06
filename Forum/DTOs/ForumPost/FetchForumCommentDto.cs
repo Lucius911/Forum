@@ -15,8 +15,9 @@ namespace Forum.DTOs.ForumPost
     {
       Id = entity.Id;
       Content = entity.CommentContent;
-      Username = entity.UserId; 
+      Username = entity.User.UserName; 
       CreatedAt = entity.CreatedAt;
+
     }
   }
 }
