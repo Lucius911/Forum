@@ -80,5 +80,33 @@ namespace Forum.Controllers
         return this.BadRequest(e.Message);
       }
     }
+
+    [Authorize]
+    [HttpPost("/CreateComment")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateComment([FromBody] CreateForumPostComment forumPostComment)
+    {
+      try
+      {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+          return Unauthorized("You have to be logged in to comment on a post.");
+        }
+
+        forumPostComment.UserId = userId;
+        var comment = forumPostComment.Map();
+
+        var result = await _forumService.CreateForumComment(comment);
+
+        return this.Ok(result);
+      }
+      catch (Exception ex)
+      {
+        return this.BadRequest(ex.Message);
+      }
+    }
   }
 }

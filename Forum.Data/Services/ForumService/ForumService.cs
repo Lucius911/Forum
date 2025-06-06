@@ -14,7 +14,7 @@ namespace Forum.Data.Services.ForumService
       try
       {
         _logger.LogInformation("Fetching all forum posts from the database.");
-        return await _context.ForumPosts.ToListAsync().ConfigureAwait(false);
+        return await _context.ForumPosts.Include(x => x.Comments).ToListAsync().ConfigureAwait(false);
       }
       catch (Exception ex)
       {
@@ -37,6 +37,24 @@ namespace Forum.Data.Services.ForumService
       {
         _logger.LogError(ex, "An error occurred while creating a forum post.");
         throw new Exception($"Error while attempting CreatePostAsync: {ex.Message}");
+      }
+    }
+
+    public async Task<ForumPost> CreateForumComment(ForumComment comment)
+    {
+      try
+      {
+        _context.ForumComments.Add(comment);
+        await _context.SaveChangesAsync().ConfigureAwait(false);
+
+        _logger.LogInformation($"Comment created for post {comment.ForumPostId} by user {comment.UserId}.");
+        return await _context.ForumPosts
+          //.Include(p => p.Comments)
+          .FirstOrDefaultAsync(p => p.Id == comment.ForumPostId);
+      }
+      catch (Exception ex)
+      {
+        throw new Exception($"Error while attempting CreateForumComment: {ex.Message}");
       }
     }
 
