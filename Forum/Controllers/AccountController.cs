@@ -16,6 +16,7 @@ namespace Forum.Controllers
   public class AccountController(
     UserManager<IdentityUser> userManager,
     SignInManager<IdentityUser> signInManager,
+    RoleManager<IdentityRole> roleManager,
     IOptions<JwtSettings> jwtSettings)
     : ControllerBase
   {
@@ -37,9 +38,26 @@ namespace Forum.Controllers
       var result = await userManager.CreateAsync(user, model.Password);
       if (result.Succeeded)
       {
+        if (model.IsModerator)
+        {
+          await CheckAndAddUserToRole(user);
+        }
+
         return Ok(new { Message = "User registered successfully." });
       }
       return BadRequest(result.Errors);
+    }
+
+    private async Task CheckAndAddUserToRole(IdentityUser user)
+    {
+      var roleExists = await roleManager.RoleExistsAsync("Moderator");
+
+      if (!roleExists)
+      {
+        await roleManager.CreateAsync(new IdentityRole("Moderator"));
+      }
+
+      await userManager.AddToRoleAsync(user, "Moderator");
     }
 
     [HttpPost("login")]
@@ -61,8 +79,7 @@ namespace Forum.Controllers
       if (!result.Succeeded)
         return Unauthorized();
 
-
-      var token = GenerateJwtToken(user);
+      var token = await GenerateJwtToken(user);
 
       // return for ease of use 
       return this.Ok(new JwtSecurityTokenHandler().WriteToken(token));
@@ -73,7 +90,7 @@ namespace Forum.Controllers
       //});
     }
 
-    private JwtSecurityToken GenerateJwtToken(IdentityUser user)
+    private async Task<JwtSecurityToken> GenerateJwtToken(IdentityUser user)
     {
       //Create our Jwt for auth 
       var authClaims = new List<Claim>
@@ -82,6 +99,14 @@ namespace Forum.Controllers
         new Claim(ClaimTypes.Email, user.Email),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
       };
+
+      var isModerator = await userManager.IsInRoleAsync(user, "Moderator");
+
+      if (isModerator)
+      {
+        // hardcoding due to time contraint
+        authClaims.Add(new Claim(ClaimTypes.Role, "Moderator"));
+      }
 
       var authSignKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_jwtSettings.Key));
 

@@ -4,13 +4,14 @@ using Forum.Data.Services.ForumService;
 using Forum.DTOs.ForumPost;
 using Forum.Mapping;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers
 {
   [ApiController]
   [Route("api/[controller]")]
-  public class ForumController(ILogger<ForumController> logger, IForumService _forumService) : ControllerBase
+  public class ForumController(ILogger<ForumController> logger, IForumService _forumService, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) : ControllerBase
   {
     [AllowAnonymous]
     [HttpGet("FetchAll")]
@@ -27,7 +28,7 @@ namespace Forum.Controllers
 
         if (forumPostResult.Any())
         {
-           result = MapFromHelper.MapEntitiesToDtos<ForumPost, FetchForumPostDto>(forumPostResult);
+          result = MapFromHelper.MapEntitiesToDtos<ForumPost, FetchForumPostDto>(forumPostResult);
         }
 
         return this.Ok(result);
@@ -92,6 +93,43 @@ namespace Forum.Controllers
     }
 
     [Authorize]
+    [HttpPost("MarkAsMisleading/{postId}")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> MarkAsMisleading(int postId)
+    {
+      try
+      {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+          return Unauthorized("You have to be authorized to use this feature");
+        }
+
+        var result = await userManager.FindByIdAsync(userId);
+
+        //Check user is in role
+        var isModUser = await userManager.IsInRoleAsync(result, "Moderator");
+
+        if (isModUser)
+        {
+          var toggled = await _forumService.MarkAsMisleading(postId);
+        }
+        else
+        {
+          return this.Ok("You don't have permission");
+        }
+
+        return this.Ok("Post marked as Misleading");
+      }
+      catch (Exception ex)
+      {
+        return this.BadRequest(ex.Message);
+      }
+    }
+
+    [Authorize]
     [HttpPost("CreateComment")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -118,5 +156,7 @@ namespace Forum.Controllers
         return this.BadRequest(ex.Message);
       }
     }
+
+
   }
 }

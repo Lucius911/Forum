@@ -6,41 +6,16 @@
           <v-card-title class="text-h5">Login</v-card-title>
           <v-card-text>
             <v-form @submit.prevent="loginUser" ref="form">
-              <v-text-field
-                v-model="email"
-                label="Email"
-                prepend-icon="mdi-email"
-                type="email"
-                required
-              />
+              <v-text-field v-model="email" label="Email" prepend-icon="mdi-email" type="email" required />
 
-              <v-text-field
-                v-model="password"
-                label="Password"
-                prepend-icon="mdi-lock"
-                type="password"
-                required
-              />
+              <v-text-field v-model="password" label="Password" prepend-icon="mdi-lock" type="password" required />
 
-              <v-btn
-                type="submit"
-                color="primary"
-                :loading="loading"
-                :disabled="loading"
-                class="mt-4"
-                block
-              >
+              <v-btn type="submit" color="primary" :loading="loading" :disabled="loading" class="mt-4" block>
                 Login
               </v-btn>
             </v-form>
 
-            <v-alert
-              v-if="error"
-              type="error"
-              class="mt-4"
-              border="start"
-              variant="outlined"
-            >
+            <v-alert v-if="error" type="error" class="mt-4" border="start" variant="outlined">
               {{ error }}
             </v-alert>
           </v-card-text>
@@ -82,6 +57,8 @@ export default {
         }
 
         const data = await response.text();
+
+
         // Store JWT token in localStorage/sessionStorage or Vuex store
         localStorage.setItem('jwtToken', data);
         // Redirect or do other login success logic

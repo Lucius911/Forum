@@ -19,5 +19,6 @@ namespace Forum.DTOs.Account
     public string LastName { get; set; }
     [Required]
     public string DisplayName { get; set; }
+    public bool IsModerator { get; set; }
   }
 }

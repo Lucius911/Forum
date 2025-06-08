@@ -15,6 +15,7 @@ namespace Forum.Data.Models.Forum
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public IdentityUser User { get; set; } //Navigation prop
+    public bool IsMisleading { get; set; }
 
     //Collections
     public ICollection<ForumComment> Comments { get; set; }

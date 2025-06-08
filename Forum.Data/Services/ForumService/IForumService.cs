@@ -8,5 +8,6 @@ namespace Forum.Data.Services.ForumService
     Task<ForumPost> CreatePostAsync(ForumPost post);
     Task<ForumPost> CreateForumComment(ForumComment comment);
     Task<bool> ToggleLikeAsync(int postId, string userId);
+    Task<bool> MarkAsMisleading(int postId);
   }
 }

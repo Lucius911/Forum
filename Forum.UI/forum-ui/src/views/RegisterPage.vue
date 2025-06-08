@@ -6,72 +6,28 @@
           <v-card-title class="text-h5">Register</v-card-title>
           <v-card-text>
             <v-form @submit.prevent="registerUser" ref="form" validate-on="submit">
-              <v-text-field
-                v-model="firstName"
-                label="First Name"
-                prepend-icon="mdi-account"
-                required
-              />
+              <v-text-field v-model="firstName" label="First Name" prepend-icon="mdi-account" required />
 
-              <v-text-field
-                v-model="lastName"
-                label="Last Name"
-                prepend-icon="mdi-account"
-                required
-              />
+              <v-text-field v-model="lastName" label="Last Name" prepend-icon="mdi-account" required />
 
-              <v-text-field
-                v-model="displayName"
-                label="Display Name"
-                prepend-icon="mdi-account-circle"
-                required
-              />
+              <v-text-field v-model="displayName" label="Display Name" prepend-icon="mdi-account-circle" required />
 
-              <v-text-field
-                v-model="email"
-                label="Email"
-                type="email"
-                prepend-icon="mdi-email"
-                required
-              />
+              <v-text-field v-model="email" label="Email" type="email" prepend-icon="mdi-email" required />
 
-              <v-text-field
-                v-model="password"
-                label="Password"
-                type="password"
-                prepend-icon="mdi-lock"
-                required
-              />
+              <v-text-field v-model="password" label="Password" type="password" prepend-icon="mdi-lock" required />
 
-              <v-text-field
-                v-model="confirmPassword"
-                label="Confirm Password"
-                type="password"
-                prepend-icon="mdi-lock-check"
-                :error="passwordMismatch"
-                :error-messages="passwordMismatch ? ['Passwords do not match'] : []"
-                required
-              />
+              <v-text-field v-model="confirmPassword" label="Confirm Password" type="password"
+                prepend-icon="mdi-lock-check" :error="passwordMismatch"
+                :error-messages="passwordMismatch ? ['Passwords do not match'] : []" required />
 
-              <v-btn
-                type="submit"
-                color="primary"
-                :loading="loading"
-                :disabled="loading"
-                class="mt-4"
-                block
-              >
+              <v-checkbox v-model="isModerator" label="Register as Moderator" class="mt-2" />
+
+              <v-btn type="submit" color="primary" :loading="loading" :disabled="loading" class="mt-4" block>
                 Register
               </v-btn>
             </v-form>
 
-            <v-alert
-              v-if="error"
-              type="error"
-              class="mt-4"
-              border="start"
-              variant="outlined"
-            >
+            <v-alert v-if="error" type="error" class="mt-4" border="start" variant="outlined">
               {{ error }}
             </v-alert>
           </v-card-text>
@@ -82,6 +38,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'RegisterPage',
   data() {
@@ -94,6 +51,7 @@ export default {
       confirmPassword: '',
       loading: false,
       error: null,
+      isModerator: false,
     };
   },
   computed: {
@@ -122,6 +80,7 @@ export default {
             email: this.email,
             password: this.password,
             confirmPassword: this.confirmPassword,
+            isModerator: this.isModerator,
           }),
         });
 

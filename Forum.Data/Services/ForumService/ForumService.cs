@@ -31,6 +31,7 @@ namespace Forum.Data.Services.ForumService
             UserId = x.User.Id,
             LikesCount = x.Likes.Count, 
             UserName = x.User.UserName,
+            IsMisleading = x.IsMisleading,
             Likes = null // we don't need to load this, we just need the count
           }).ToListAsync();
       }
@@ -38,6 +39,31 @@ namespace Forum.Data.Services.ForumService
       {
         _logger.LogError(ex, "An error occurred while fetching forum posts.");
         throw new Exception($"Error while attempting GetAllPostsAsync: {ex.Message}");
+      }
+    }
+
+    public async Task<bool> MarkAsMisleading(int postId)
+    {
+      try
+      {
+        _logger.LogInformation("Marking post as misleading");
+
+        var post = await context.ForumPosts.FirstOrDefaultAsync(x => x.Id == postId);
+
+        //same logic as like, more a toggle than an update
+        if (post != null)
+        {
+          post.IsMisleading = !post.IsMisleading;
+        }
+
+        context.ForumPosts.Update(post);
+        await context.SaveChangesAsync();
+
+        return true;
+      }
+      catch (Exception ex)
+      {
+        throw new Exception(ex.Message);
       }
     }
 

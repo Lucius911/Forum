@@ -32,9 +32,12 @@
             </v-alert>
 
             <v-row v-else>
-                <v-col cols="12" md="6" v-for="post in posts" :key="post.id">
+                <v-col cols="12" md="6" v-for="post in posts" :key="post.id" style="padding-top: 1%">
                     <v-card>
                         <v-card-title>{{ post.title }}</v-card-title>
+                        <v-chip v-if="post.isMisleading" color="red" text-color="white" small class="ml-2">
+                            ⚠️ Misleading
+                        </v-chip>
                         <v-card-text>{{ post.content }}</v-card-text>
                         <v-divider class="my-2"></v-divider>
 
@@ -48,6 +51,9 @@
                                 <v-icon @click="openCommentDialog(post.id)"
                                     color="grey darken-1">mdi-comment-outline</v-icon>
                                 <span class="ml-1">{{ post.commentsCount || 0 }}</span>
+                            </v-btn>
+                            <v-btn icon :color="post.isMisleading ? 'red' : 'grey'" @click="toggleMisleading(post.id)">
+                                <v-icon>mdi-help-circle-outline</v-icon>
                             </v-btn>
                         </v-card-actions>
                         <v-card-actions>
@@ -117,6 +123,25 @@ export default {
         goToRegister() {
             this.$router.push("/register");
         },
+        async toggleMisleading(postId) {
+            if (!this.isAuthenticated) {
+                this.$router.push("/login");
+            }
+
+            const result = await fetch(`https://localhost:7189/api/forum/MarkAsMisleading/${postId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                },
+            });
+
+            await this.fetchPosts();
+
+            if (!result.ok) {
+                return;
+            }
+        },
         async toggleLike(postId) {
             console.log(this.isAuthenticated);
             if (!this.isAuthenticated) {
@@ -174,6 +199,7 @@ export default {
         },
         isUserAuthenticated() {
             var tokenExists = localStorage.getItem("jwtToken");
+            console.log(localStorage.getItem("jwtToken"));
             this.isAuthenticated = !!tokenExists;
         },
     },

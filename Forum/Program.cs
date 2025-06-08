@@ -91,7 +91,7 @@ public class Program
           .AllowAnyMethod();
       });
     });
-
+    
     var app = builder.Build();
     app.UseCors("AllowMyFE");
     app.UseAuthentication();
